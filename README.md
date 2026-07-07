@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # NOVA — Personal AI Assistant (Phase 1–3, 4 & 6 Prototype)
 
 This is a real, working starting point for the NOVA project, covering:
@@ -154,4 +154,4 @@ what's already working.
 =======
 # NOVA
 NOVA: A Hybrid Intelligent Personal AI Assistant with Autonomous Learning, Security, and Multimodal Interaction
->>>>>>> 5376acd9f2ecb7436712ee1f5f013eed26fcbc5b
+ 5376acd9f2ecb7436712ee1f5f013eed26fcbc5b
