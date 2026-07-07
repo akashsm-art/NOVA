@@ -15,6 +15,7 @@ class SpeechListener:
         self.timeout = timeout
         self.phrase_time_limit = phrase_time_limit
         self.microphone = sr.Microphone()
+        self.last_audio = None  # most recent raw AudioData, for voice-tone analysis
 
         # One-time ambient noise calibration so recognition is more reliable.
         with self.microphone as source:
@@ -36,6 +37,7 @@ class SpeechListener:
             except sr.WaitTimeoutError:
                 return ""
 
+        self.last_audio = audio
         return self._speech_to_text(audio)
 
     def _speech_to_text(self, audio) -> str:

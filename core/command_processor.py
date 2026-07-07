@@ -27,11 +27,14 @@ PRIVILEGED_PATTERNS = (
 
 class CommandProcessor:
     def __init__(self, system_control: SystemControl, assistant_name: str = "Nova",
-                 memory: MemoryManager = None, face_auth=None):
+                 memory: MemoryManager = None, face_auth=None,
+                 emotion_detector=None, speech_listener=None):
         self.system_control = system_control
         self.assistant_name = assistant_name
         self.memory = memory
         self.face_auth = face_auth
+        self.emotion_detector = emotion_detector
+        self.speech_listener = speech_listener
 
     def requires_owner_verification(self, text: str) -> bool:
         """Whether this command should be gated behind a face-recognition check."""
@@ -82,6 +85,16 @@ class CommandProcessor:
                 items = ", ".join(f"{m['key'].replace('_', ' ')}: {m['value']}" for m in memories[:5])
                 return f"Here's what I remember: {items}.", False
             return "I don't have memory set up yet.", False
+
+        if re.search(r"(how am i doing|check my mood|how do i seem|am i stressed|do i seem tired)", text):
+            if not self.emotion_detector:
+                return "Emotion detection isn't set up.", False
+            audio = self.speech_listener.last_audio if self.speech_listener else None
+            result = self.emotion_detector.detect_emotion_state(audio)
+            suggestion = self.emotion_detector.suggest_relaxation_action(result["label"])
+            if self.memory:
+                self.memory.log_emotional_state(result["label"], result["intensity"])
+            return suggestion, False
 
         if match := re.search(r"open (.+)", text):
             app = match.group(1).strip()

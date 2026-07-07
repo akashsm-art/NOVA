@@ -42,11 +42,21 @@ class NovaCore:
                 confidence_threshold=self.config.get("face_confidence_threshold", 70.0),
             )
 
+        self.emotion_detector = None
+        if self.config.get("emotion_detection_enabled", False):
+            from emotion.emotion_detection import EmotionDetector
+            self.emotion_detector = EmotionDetector(
+                camera_index=self.config.get("camera_index", 0),
+                model_path=self.config.get("emotion_model_path", "data/emotion-ferplus-8.onnx"),
+            )
+
         self.command_processor = CommandProcessor(
             self.system_control,
             self.assistant_name,
             memory=self.memory,
             face_auth=self.face_auth,
+            emotion_detector=self.emotion_detector,
+            speech_listener=self.listener,
         )
 
     def _load_config(self, config_path: str) -> dict:

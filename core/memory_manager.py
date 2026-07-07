@@ -40,6 +40,14 @@ class MemoryManager:
                     timestamp DATETIME
                 )
             """)
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS emotion_logs (
+                    emotion_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    detected_emotion TEXT,
+                    intensity INTEGER,
+                    timestamp DATETIME
+                )
+            """)
             conn.commit()
 
     # ---------- facts ----------
@@ -109,4 +117,27 @@ class MemoryManager:
         return [
             {"user_input": u, "nova_response": r, "timestamp": t}
             for u, r, t in rows
+        ]
+
+    # ---------- emotion logs ----------
+
+    def log_emotional_state(self, detected_emotion: str, intensity: int) -> None:
+        with self._connect() as conn:
+            conn.execute("""
+                INSERT INTO emotion_logs (detected_emotion, intensity, timestamp)
+                VALUES (?, ?, ?)
+            """, (detected_emotion, intensity, datetime.datetime.now().isoformat()))
+            conn.commit()
+
+    def retrieve_recent_emotions(self, limit: int = 5) -> list:
+        with self._connect() as conn:
+            rows = conn.execute("""
+                SELECT detected_emotion, intensity, timestamp
+                FROM emotion_logs
+                ORDER BY emotion_id DESC
+                LIMIT ?
+            """, (limit,)).fetchall()
+        return [
+            {"detected_emotion": e, "intensity": i, "timestamp": t}
+            for e, i, t in rows
         ]

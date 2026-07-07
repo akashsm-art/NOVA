@@ -9,6 +9,9 @@
   "face_auth_enabled": false,
   "face_data_dir": "data",
   "face_confidence_threshold": 70.0,
+  "emotion_detection_enabled": false,
+  "emotion_model_path": "data/emotion-ferplus-8.onnx",
+  "camera_index": 0,
   "memory_db_path": "data/nova_system.db",
   "app_aliases": {
     "chrome": "chrome.exe",

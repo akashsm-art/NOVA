@@ -1,5 +1,4 @@
-
-# NOVA — Personal AI Assistant (Phase 1–3, 4 & 6 Prototype)
+# NOVA — Personal AI Assistant (Phase 1–6 Prototype)
 
 This is a real, working starting point for the NOVA project, covering:
 
@@ -7,11 +6,47 @@ This is a real, working starting point for the NOVA project, covering:
 - **Phase 2** — Core talking assistant (listen → speech-to-text → respond → text-to-speech)
 - **Phase 3** — System automation (open/close apps, find files, lock/restart/shutdown PC)
 - **Phase 4** — Face recognition login (own-face detection gating privileged commands)
-- **Phase 6** — Memory system (remembers facts + logs conversation history in SQLite)
+- **Phase 5** — Emotion detection (heuristic facial + voice-tone mood check)
+- **Phase 6** — Memory system (remembers facts + logs conversation/emotion history in SQLite)
 
-It does **not** yet include emotion detection, cloud AI, phone integration,
-or the other later-phase modules — those need extra services/hardware and
-are best added once this is solid.
+It does **not** yet include cloud AI, phone integration, or the other
+later-phase modules — those need extra services/accounts and are best
+added once this is solid.
+
+## Phase 5 — Emotion detection (real model)
+
+**Facial emotion** now uses a real pretrained deep-learning model: **FER+**
+(Barsoum et al.'s CNN, trained on crowd-sourced relabeled FER2013 face
+images), distributed in ONNX format and run locally via `onnxruntime`
+— CPU only, no GPU, no TensorFlow/PyTorch install. It classifies a face
+into one of 8 categories: neutral, happiness, surprise, sadness, anger,
+disgust, fear, contempt, each with a confidence score.
+
+The model file (~35MB) downloads automatically the first time emotion
+detection runs (from a Hugging Face mirror of the ONNX Model Zoo) and is
+cached at `data/emotion-ferplus-8.onnx` — so it needs internet only once.
+If the automatic download fails (e.g. no internet yet), you'll get a clear
+error message with a manual-download link.
+
+**Voice tone** still uses a lightweight loudness (RMS) heuristic — there's
+no similarly small pretrained voice-emotion model; real ones (e.g.
+wav2vec2-based) need PyTorch and a much larger download. Ask if you want
+that added too.
+
+**How to use it:**
+1. In `config/nova_config.json`, set `"emotion_detection_enabled": true`.
+2. Ask **"Nova, how am I doing?"** / **"check my mood"** / **"do I seem
+   tired?"**. Nova takes a webcam snapshot, runs it through the FER+
+   model, factors in how loud/energetic your last command sounded, and
+   gives a short response — e.g. *"You sound a bit stressed or frustrated.
+   Want to take a quick breather?"*
+3. Every check is logged to the `emotion_logs` table for later trend
+   analysis.
+
+**Honest caveat:** FER+ was trained on posed/lab photos, not casual
+webcam footage, so accuracy varies with lighting, angle, and image
+quality — treat it as a genuinely real model, but not a clinical-grade
+or infallible one.
 
 ## Phase 4 — Face recognition login
 
@@ -108,6 +143,9 @@ NOVA/
 │   └── text_to_speech.py       # text → speech (pyttsx3, fully offline)
 ├── vision/
 │   └── face_recognition_module.py  # OpenCV face detection/recognition (Phase 4)
+├── emotion/
+│   ├── emotion_detection.py     # FER+ ONNX model (real) + voice-tone heuristic (Phase 5)
+│   └── download_model.py        # auto-downloads the FER+ model on first run
 ├── automation/
 │   └── system_control.py       # open/close apps, search files, run scripts, power controls
 └── data/                       # created at runtime: face_model.yml, nova_system.db, etc.
@@ -140,18 +178,12 @@ Windows should launch.
 
 ## 6. Suggested next steps (in roadmap order)
 
-1. **Phase 5 — Emotion detection**: analyze tone/expression to trigger
-   break suggestions.
-2. **Phase 7 — Security/firewall**: expand `security_events` logging and
+1. **Phase 7 — Security/firewall**: expand `security_events` logging and
    add intrusion alerts on repeated failed face verifications.
-3. **Phase 10 — Cloud AI**: replace the rule-based `CommandProcessor` with
+2. **Phase 10 — Cloud AI**: replace the rule-based `CommandProcessor` with
    a call to an LLM API for open-ended questions it doesn't have a rule for
    (the `conversation_history` table already gives it context to work with).
 
 Each of these can be built the same way this prototype was — as a self-
 contained module that plugs into `NovaCore` — so you don't have to rewrite
 what's already working.
-=======
-# NOVA
-NOVA: A Hybrid Intelligent Personal AI Assistant with Autonomous Learning, Security, and Multimodal Interaction
- 5376acd9f2ecb7436712ee1f5f013eed26fcbc5b
