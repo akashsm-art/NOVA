@@ -1,0 +1,29 @@
+{
+  "assistant_name": "Nova",
+  "wake_word": "nova",
+  "voice_rate": 175,
+  "voice_volume": 1.0,
+  "listen_timeout_seconds": 6,
+  "phrase_time_limit_seconds": 8,
+  "owner_name": "owner",
+  "face_auth_enabled": false,
+  "face_data_dir": "data",
+  "face_confidence_threshold": 70.0,
+  "memory_db_path": "data/nova_system.db",
+  "app_aliases": {
+    "chrome": "chrome.exe",
+    "google chrome": "chrome.exe",
+    "notepad": "notepad.exe",
+    "calculator": "calc.exe",
+    "paint": "mspaint.exe",
+    "word": "winword.exe",
+    "excel": "excel.exe",
+    "explorer": "explorer.exe",
+    "file explorer": "explorer.exe",
+    "vs code": "code",
+    "visual studio code": "code",
+    "spotify": "spotify.exe",
+    "cmd": "cmd.exe",
+    "command prompt": "cmd.exe"
+  }
+}
